@@ -1,0 +1,22 @@
+import pandas as pd
+
+def flatten(dataframe, col):
+    col_values = []    
+    number_of_repetitions = []
+    
+    for row in range(0, int(dataframe.shape[0])):
+        element_to_transform = dataframe[col][row]
+        if not(isinstance(element_to_transform, list)):
+            element_to_transform = [ element_to_transform ]
+            
+        col_values.extend(element_to_transform)
+        number_of_repetitions.append(len(element_to_transform))  
+        
+    final_dict = {}   
+    for c in dataframe.columns:
+        if c == col:
+            final_dict[c] = col_values
+        else:
+            list_with_repeated_values = [ [val] * number for val, number in zip(dataframe[c], number_of_repetitions) ]
+            final_dict[c] = [ item for sublist in list_with_repeated_values for item in sublist ]  
+    return pd.DataFrame.from_dict(final_dict)
