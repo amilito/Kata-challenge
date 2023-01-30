@@ -1,0 +1,98 @@
+
+class family:
+    def __init__(self, name : str):
+        self.name = name
+        self.children : List[family] = []
+    
+    def add_child(self, name):
+        child = family(name)
+        self.children.append(child)
+        return child   
+        
+def find_mother(family, member):
+    for child in family.children:
+        if child.name == member:
+            return family.name
+        mother = find_mother(child, member)
+        if mother is not None:
+            return mother
+    return None
+            
+def create_family(family, family_list):
+    for members in family_list:
+        if members[0] == family.name:
+            family.add_child(members[1])
+        for child in family.children:
+            if members[0] == child.name:
+                create_family(child, [members])
+    return family
+
+def print_family_tree(family, indent = 0):
+    print(' '* indent + family.name)
+    for child in family.children:
+        print_family_tree(child, indent + 1)
+        
+def find_the_oldest(family_list):
+    mothers = set()
+    children = set()
+    for pair in family_list:
+        mothers.add(pair[0])
+        children.add(pair[1])
+    the_oldest = mothers.difference(children)
+    return the_oldest           
+
+def sort(family_list, the_oldest, sorted = [] ):
+    for pair in family_list:
+        if pair[0] == the_oldest:           
+           sorted.append(pair)
+           family_list.remove(pair)
+           return sort(family_list, the_oldest, sorted)
+        else:
+            for pair_in_sorted in sorted:
+                if pair[0] == pair_in_sorted[1]:
+                   sorted.append(pair)
+                   family_list.remove(pair)
+                   return sort(family_list, the_oldest, sorted)  
+    return sorted
+    
+
+def relations(family_list, target_pair):
+    the_oldest = ''.join(find_the_oldest(family_list))
+    family_list_copy = family_list.copy()
+    sorted_family_list = sort(family_list_copy, the_oldest, [] )
+    new_family = create_family(family(the_oldest), sorted_family_list)
+    print_family_tree(new_family)
+    
+    mother_of_the_first = find_mother(new_family, target_pair[0])
+    mother_of_the_second = find_mother(new_family, target_pair[1])
+    mother_of_mother_of_the_first = find_mother(new_family, mother_of_the_first)
+    mother_of_mother_of_the_second = find_mother(new_family, mother_of_the_second)
+    
+    mother = mother_of_the_first == target_pair[1]
+    daughter = mother_of_the_second  == target_pair[0]
+    grandmother = mother_of_mother_of_the_first == target_pair[1]
+    granddaughter = mother_of_mother_of_the_second == target_pair[0]
+    sister = mother_of_the_first == mother_of_the_second 
+    cousin = mother_of_mother_of_the_first == mother_of_mother_of_the_second 
+    aunt = mother_of_mother_of_the_first == mother_of_the_second
+    niece = mother_of_mother_of_the_second == mother_of_the_first
+    
+    if mother:
+       return 'Mother'
+    elif daughter:
+        return 'Daughter'
+    elif grandmother:
+        return 'Grandmother'
+    elif granddaughter:
+        return 'Granddaughter'
+    elif sister:
+        return 'Sister'
+    elif cousin:
+        return 'Cousin'
+    elif aunt:
+        return 'Aunt'
+    elif niece:
+        return 'Niece'
+    else:
+        return None
+     
