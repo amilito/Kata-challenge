@@ -1,0 +1,11 @@
+def G(n):
+    g = {}
+    n = n%24
+    for i in range(0,n+1):
+        if i == 0:
+            g[0] = 7
+        elif i == 1:
+            g[1] = 4
+        else:
+            g[i] = ((g[i-1]*g[i-2])%9+ g[i-1] + g[i-2])%9
+    return g[n]
